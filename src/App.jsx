@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import "./App.css";
 import { Task } from "./components/Task";
@@ -18,7 +17,7 @@ function App() {
   ];
 
   return (
-    <div className="Board min-w-full w-full h-full min-h-full flex-1 flex self-stretch gap-4 bg-[#F7F7F7] text-[#0e0a0a]">
+    <div className="Board w-full h-full min-h-screen flex flex-col lg:flex-row gap-4 bg-[#F7F7F7] text-[#0e0a0a] p-4 overflow-auto">
       {board.map(({ id, stage, label, setStage }, index) => (
         <Stage
           id={id}
@@ -28,7 +27,6 @@ function App() {
             if (!newItem) return;
             let value = {
               ...newItem,
-              // value: newItem,
               id: generateId(),
               parentId: id,
               history: [],
@@ -78,12 +76,12 @@ export default App;
 
 const Stage = ({ id, label, addTask, moveTask, children }) => {
   const onDrop = (e) => {
-    // console.log("dropped", e.dataTransfer.getData("draggedItem"));
     const item = JSON.parse(e.dataTransfer.getData("draggedItem"));
     const { id: itemId, value, parentId, history } = item;
     if (parentId === id) return;
     moveTask(item, parentId, id);
   };
+
   return (
     <div
       id={id}
@@ -91,38 +89,32 @@ const Stage = ({ id, label, addTask, moveTask, children }) => {
         onDrop(e);
         e.currentTarget.classList.remove("drag-wrapper");
       }}
-      onDragOver={(e) => {
-        e.preventDefault();
-      }}
+      onDragOver={(e) => e.preventDefault()}
       onDragEnter={(e) => e.currentTarget.classList.add("drag-wrapper")}
       onDragLeave={(e) =>
-        console.log(
-          e,
-          e.target,
-          e.currentTarget.classList.remove("drag-wrapper")
-        )
+        e.currentTarget.classList.remove("drag-wrapper")
       }
-      className="Stage p-4 w-full flex-1 flex flex-col gap-4 text-lg font-semibold overflow-auto border-2 border-transparent"
+      className="Stage p-4 flex-1 flex flex-col gap-4 text-lg font-semibold overflow-auto border-2 border-transparent bg-white shadow-md rounded-lg"
     >
-      <div className="flex px-2 py-4">
-        <h4 className="text-xl w-full flex-1 flex justify-start">{label}</h4>
+      <div className="flex px-2 py-4 justify-between items-center">
+        <h4 className="text-xl">{label}</h4>
         <Task addTask={addTask} />
       </div>
       {children}
     </div>
   );
 };
-// #365EFF
 
 const Item = ({ id, parentId, history, deleteItem, ...rest }) => {
   const { title, content, tags, collabs } = rest;
   const [currHistory, setCurrHistory] = useState(history);
+
   useEffect(() => {
     if (history.length > 0 && history[history.length] === parentId) return;
     setCurrHistory([...currHistory, parentId]);
   }, []);
+
   const onDragStartFn = (e) => {
-    console.log("dragging", e.target.innerHTML);
     e.dataTransfer.setData(
       "draggedItem",
       JSON.stringify({
@@ -133,50 +125,43 @@ const Item = ({ id, parentId, history, deleteItem, ...rest }) => {
       })
     );
   };
-  const onDragEndFn = (e) => {
-    console.log("drag ended");
-  };
+
   return (
     <div
       draggable
       onDragStart={onDragStartFn}
-      onDragEnd={onDragEndFn}
-      className="Item border shadow rounded-lg flex flex-col justify-start items-start bg-[#FFFFFF]"
+      className="Item border shadow rounded-lg flex flex-col justify-start items-start bg-[#FFFFFF] p-4 gap-4 text-sm sm:text-base"
     >
-      <div className="p-4 flex flex-col justify-start items-start gap-4">
-        <div className="flex justify-start ">
-          {tags.slice(0, 2).map((tag, index) => (
-            <span
-              key={index}
-              className="bg-[#365EFF99] text-[#fff7d1] px-4 py-1.5 pb-2 rounded-full text-sm"
-            >
-              {tag}
-            </span>
-          ))} 
-          <button onClick={deleteItem}>Delete</button>
-        </div>
-        <h4 className="text-lg leading-none font-semibold">{title}</h4>
-        {content ? (
-          <p className="text-xs opacity-90 text-wrap leading-3 truncate--x">
-            {content}
-          </p>
-        ) : null}
+      <div className="flex justify-between items-center w-full">
+        <h4 className="font-semibold truncate">{title}</h4>
+        <button
+          onClick={deleteItem}
+          className="text-red-500 text-xs sm:text-sm hover:underline"
+        >
+          Delete
+        </button>
       </div>
-      <div className="h-1 border w-full" />
-      <div className="p-4 flex justify-start items-start">
-        {collabs.slice(0, 4).map((collab, index) => {
-          console.log(`translate-x-[-${index*50}%] `);
-          return(
+      <p className="text-gray-600 text-sm truncate">{content}</p>
+      <div className="flex flex-wrap gap-2">
+        {tags.slice(0, 2).map((tag, index) => (
           <span
             key={index}
-            className={`p-2 w-10 h-10 aspect-square bg-[#365EFF] text-[#fff7d1] text-base rounded-full translate-x-[-${index*50}%] `}
+            className="bg-blue-200 text-blue-800 px-2 py-1 rounded-full text-xs"
           >
-            {collab.slice(0, 1).toUpperCase()}
+            {tag}
           </span>
-        )})}
+        ))}
+      </div>
+      <div className="flex -space-x-2">
+        {collabs.slice(0, 4).map((collab, index) => (
+          <span
+            key={index}
+            className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm"
+          >
+            {collab[0].toUpperCase()}
+          </span>
+        ))}
       </div>
     </div>
   );
 };
-
-

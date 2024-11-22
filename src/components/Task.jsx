@@ -5,20 +5,19 @@ export const Task = ({ addTask }) => {
   const [isTakingInput, setIsTakingInput] = useState(false);
   return (
     <>
-      
       <img
-        className="max-w-full w-6 h-full aspect-square"
+        className="w-6 h-6 aspect-square cursor-pointer sm:w-8 sm:h-8"
         src={AddIcon}
         onClick={() => setIsTakingInput(!isTakingInput)}
       />
       {isTakingInput ? (
-        <div className="w-screen h-screen absolute top-0 left-0 flex justify-center items-center bg-[#0b080840]">
-          <div className="flex flex-col gap-4 text-[#1e1e1e] py-7 px-9 pb-10 bg-white rounded-xl">
-            Add New Task
+        <div className="w-screen h-screen fixed top-0 left-0 flex justify-center items-center bg-[#0b080840]">
+          <div className="flex flex-col gap-4 text-[#1e1e1e] py-7 px-5 sm:px-9 bg-white rounded-xl max-w-md w-full">
+            <h2 className="text-lg font-bold">Add New Task</h2>
             <FormInput
               className={"flex flex-col gap-4"}
               inputClassName={
-                "p-2 px-4 border rounded bg-white text-black border-4 rounded-lg"
+                "p-2 px-4 border rounded bg-white text-black border-2 rounded-lg"
               }
               placeholder="Enter your task"
               handleSubmit={(value) => {
@@ -29,12 +28,9 @@ export const Task = ({ addTask }) => {
           </div>
         </div>
       ) : null}
-
-      {/* // </div> */}
     </>
   );
 };
-
 
 const FormInput = ({
   className,
@@ -49,7 +45,7 @@ const FormInput = ({
 
   return (
     <form
-      className={`${className} `}
+      className={`${className}`}
       onSubmit={(event) => {
         event.preventDefault();
         const item = {
@@ -59,14 +55,17 @@ const FormInput = ({
           collabs: collabs.split(",").map((collab) => collab.trim()),
         };
         handleSubmit(item);
-        setInput("");
+        setTitle("");
+        setContent("");
+        setTags("");
+        setCollabs("");
       }}
     >
       <Input
         type="text"
         value={title}
-        label={"Task Title"}
-        placeholder={"Enter Title"}
+        label="Task Title"
+        placeholder="Enter Title"
         className={inputClassName}
         onChange={(e) => setTitle(e.target.value)}
         required
@@ -74,8 +73,8 @@ const FormInput = ({
       <Input
         type="text"
         value={content}
-        label={"Task Content"}
-        placeholder={"Enter Content"}
+        label="Task Content"
+        placeholder="Enter Content"
         className={inputClassName}
         onChange={(e) => setContent(e.target.value)}
       />
@@ -83,7 +82,7 @@ const FormInput = ({
         type="textarea"
         value={tags}
         label="Tags"
-        placeholder={"Enter Tags\n (comma seperated)"}
+        placeholder="Enter Tags (comma separated)"
         className={inputClassName}
         onChange={(e) => setTags(e.target.value)}
         optional
@@ -92,20 +91,17 @@ const FormInput = ({
         type="textarea"
         value={collabs}
         label="Collaborators"
-        placeholder={"Enter Colabs's Email (comma seperated)"}
+        placeholder="Enter Collaborators' Emails (comma separated)"
         className={inputClassName}
         onChange={(e) => setCollabs(e.target.value)}
         optional
       />
-      <button className="bg-blue-500 text-white p-2 rounded-lg">
-        {" "}
-        Add Task{" "}
+      <button className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-all">
+        Add Task
       </button>
     </form>
   );
 };
-
-
 
 const Input = ({
   type = "text",
@@ -117,16 +113,13 @@ const Input = ({
   required = false,
   optional = false,
 }) => {
-  //   const [input, setInput] = useState("");
   return (
     <label className="flex flex-col gap-1">
-      <span className="text-lg font-semibold flex gap-2 justify-start items-center ">
+      <span className="text-sm sm:text-base font-semibold flex gap-2 justify-start items-center">
         {label}
         {required ? <span className="text-red-500">*</span> : null}
         {optional && !required ? (
-          <span className="text-slate-400 italic text-xs">
-            {"( Optional )"}
-          </span>
+          <span className="text-slate-400 italic text-xs">(Optional)</span>
         ) : null}
       </span>
       {type === "textarea" ? (
@@ -134,7 +127,7 @@ const Input = ({
           required={required}
           value={value}
           placeholder={placeholder}
-          className={className}
+          className={`${className} resize-none`}
           onChange={onChange}
         />
       ) : (
